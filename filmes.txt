@@ -1,0 +1,2 @@
+id:1;titulo:Jemison foda;diretor:DD;genero:Sexo;ano:2025;avaliacao:8;
+id:2;titulo:se;diretor:12;genero:2024;ano:2024;avaliacao:2;
