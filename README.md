@@ -69,4 +69,3 @@ Sistema de gerenciamento de catálogo de filmes pessoais, permitindo controlar f
 ## 7. Autores
 
 * Jemison Da silva
-"# Projeto-c"  git init git add README.md git commit -m "first commit" git branch -M main git remote add origin git@github.com:hjuss935/Projeto-c.git git push -u origin main
