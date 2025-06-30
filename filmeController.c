@@ -5,21 +5,27 @@
 #include "filmeView.h"
 #include "filmeController.h"
 
+
+
+/**
+ * carregarFilmes(); func~ção para carrega os filmes vindo do filme.txt
+ */
 void carregarFilmes() {
-    FILE *file = fopen(ARQUIVO_FILMES, "r");
-    if (!file) return;
+    FILE *file = fopen(ARQUIVO_FILMES, "r");  // Abre o arquivo para leitura
+    if (!file) return;                        // Se não conseguir abrir, encerra a função
 
     char linha[500];
     while (fgets(linha, sizeof(linha), file) && totalFilmes < MAX_FILMES) {
-        Filme *f = &filmes[totalFilmes];
-        char *token = strtok(linha, ";");
+        Filme *f = &filmes[totalFilmes];      // Aponta para a próxima posição disponível
+        char *token = strtok(linha, ";");     // Quebra a linha em tokens separados por ;
 
         while (token) {
-            char *sep = strchr(token, ':');
+            char *sep = strchr(token, ':');   // Localiza o separador de campo ':'
             if (sep) {
-                *sep = '\0';
+                *sep = '\0';                  // Quebra a string no caractere ':'
                 char *valor = sep + 1;
 
+                // Compara o campo e preenche os dados
                 if (strcmp(token, "id") == 0) f->id = atoi(valor);
                 else if (strcmp(token, "titulo") == 0) strncpy(f->titulo, valor, sizeof(f->titulo));
                 else if (strcmp(token, "diretor") == 0) strncpy(f->diretor, valor, sizeof(f->diretor));
@@ -27,33 +33,49 @@ void carregarFilmes() {
                 else if (strcmp(token, "ano") == 0) f->ano = atoi(valor);
                 else if (strcmp(token, "avaliacao") == 0) f->avaliacao = atoi(valor);
             }
-            token = strtok(NULL, ";");
+            token = strtok(NULL, ";"); // Avança para o próximo campo
         }
-        totalFilmes++;
+        totalFilmes++; // Incrementa o total de filmes carregados
     }
-    fclose(file);
+    fclose(file); // Fecha o arquivo
 }
-
+/**
+ * @brief Salva a lista de filmes no arquivo definido por ARQUIVO_FILMES.
+ *
+ * Abre o arquivo em modo escrita e grava os dados dos filmes no formato
+ * chave:valor separados por ponto e vírgula. Caso não consiga abrir o arquivo,
+ * imprime mensagem de erro no stderr.
+ */
 void salvarFilmes() {
-    FILE *file = fopen(ARQUIVO_FILMES, "w");
+    FILE *file = fopen(ARQUIVO_FILMES, "w");  // Abre o arquivo para escrita
     if (!file) {
         perror("Erro ao salvar filmes");
         return;
     }
 
+    // Salva cada filme no formato "chave:valor;"
     for (int i = 0; i < totalFilmes; i++) {
         Filme *f = &filmes[i];
         fprintf(file, "id:%d;titulo:%s;diretor:%s;genero:%s;ano:%d;avaliacao:%d;\n",
                 f->id, f->titulo, f->diretor, f->genero, f->ano, f->avaliacao);
     }
-    fclose(file);
+
+    fclose(file); // Fecha o arquivo
 }
 
+/**
+ * @brief lista de filmes no arquivo definido por ARQUIVO_FILMES.
+ *
+ * Abre o arquivo em modo escrita e mostra no terminal
+ */
 int listFilmes() {
     exibirListaFilmes();
     return 1;
 }
-
+/**
+ * @brief Buscar de filmes com base no paramento diretor no arquivo definido por ARQUIVO_FILMES.
+ *
+ */
 int buscarFilme() {
     char nome[50];
     printf("Digite o nome do diretor: ");
@@ -71,7 +93,12 @@ int buscarFilme() {
 
     return achou;
 }
-
+/**
+ * @brief Busca e exibe filmes pelo gênero informado pelo usuário.
+ *
+ * Solicita ao usuário a entrada do gênero e procura todos os filmes cujo
+ * campo 'genero' contenha a string informada. Exibe os filmes encontrados.
+*/
 int buscarFilmeGenero() {
     char genero[30];
     printf("Digite o genero: ");
@@ -89,7 +116,13 @@ int buscarFilmeGenero() {
 
     return achou;
 }
-
+/**
+ * @brief Adiciona um novo filme ao catálogo.
+ *
+ * Solicita dados do usuário para criar um novo filme e adiciona ao array global
+ * 'filmes', atualizando o arquivo com salvarFilmes(). Verifica se o limite máximo
+ * de filmes foi atingido antes de adicionar.
+ */
 int adicionaFilme() {
     if (totalFilmes >= MAX_FILMES) {
         printf("Limite de filmes atingido!\n");
@@ -124,7 +157,14 @@ int adicionaFilme() {
     printf("Filme adicionado!\n");
     return 1;
 }
-
+/**
+ * @brief Edita os dados de um filme existente.
+ *
+ * Solicita o ID do filme, verifica validade, e permite editar título, diretor,
+ * gênero, ano e avaliação. Campos podem ser mantidos se o usuário apertar ENTER
+ * sem digitar novos dados.
+ *
+ */
 int editarFilme() {
     int id;
     printf("Digite o ID do filme a editar: ");
@@ -175,7 +215,12 @@ int editarFilme() {
     printf("Filme atualizado com sucesso!\n");
     return 1;
 }
-
+/**
+ * @brief Atualiza apenas a avaliação de um filme pelo seu ID.
+ *
+ * Solicita o ID do filme, valida e permite atualizar a avaliação com valor entre
+ * 0 e 10. Após atualização, salva os dados no arquivo.
+*/
 int atualizarAvaliacao() {
     int id;
     printf("Digite o ID do filme: ");
@@ -201,7 +246,15 @@ int atualizarAvaliacao() {
     printf("Avaliacaoo atualizada com sucesso!\n");
     return 1;
 }
-
+/**
+ * @brief Função de comparação para ordenar filmes por ano (crescente).
+ *
+ * Se os anos forem iguais, ordena por título em ordem alfabética.
+ *
+ * @param a Ponteiro para o primeiro filme.
+ * @param b Ponteiro para o segundo filme.
+ * @return int Valor negativo se a < b, positivo se a > b, zero se iguais.
+ */
 int compararAno(const void *a, const void *b) {
     Filme *fa = (Filme *)a;
     Filme *fb = (Filme *)b;
@@ -209,13 +262,24 @@ int compararAno(const void *a, const void *b) {
         return fa->ano - fb->ano;
     return strcmp(fa->titulo, fb->titulo);
 }
-
+/**
+ * @brief Função de comparação para ordenar filmes por título (ordem alfabética).
+ *
+ * @param a Ponteiro para o primeiro filme.
+ * @param b Ponteiro para o segundo filme.
+ */
 int compararTitulo(const void *a, const void *b) {
     Filme *fa = (Filme *)a;
     Filme *fb = (Filme *)b;
     return strcmp(fa->titulo, fb->titulo);
 }
-
+/**
+ * @brief Lista os filmes ordenados por ano.
+ *
+ * Cria uma cópia do array de filmes, ordena por ano usando qsort e exibe a lista.
+ * Se não houver filmes cadastrados, exibe mensagem informativa.
+ *
+ */
 int listarPorAno() {
     if (totalFilmes == 0) {
         printf("Nenhum filme cadastrado.\n");
@@ -232,7 +296,12 @@ int listarPorAno() {
     }
     return 1;
 }
-
+/**
+ * @brief Lista os filmes ordenados por título.
+ *
+ * Cria uma cópia do array de filmes, ordena por título usando qsort e exibe a lista.
+ * Se não houver filmes cadastrados, exibe mensagem informativa.
+  */
 int listarPorTitulo() {
     if (totalFilmes == 0) {
         printf("Nenhum filme cadastrado.\n");
