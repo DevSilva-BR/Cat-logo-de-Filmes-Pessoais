@@ -45,8 +45,8 @@ Sistema de gerenciamento de catálogo de filmes pessoais, permitindo controlar f
 1. **Clone o repositório:**
 
    ```bash
-   git clone [LINK_DO_REPOSITORIO]
-   cd [PASTA_DO_PROJETO]
+   git clone https://github.com/DevSilva-BR/Cat-logo-de-Filmes-Pessoais.git
+   cd Cat-logo-de-Filmes-Pessoais
    ```
 2. **Compile o projeto:**
 
